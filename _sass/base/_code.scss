@@ -34,8 +34,8 @@ pre {
   }
 }
 
-// Language label
-.highlight::before,
+// Language label: only on the top-level wrapper (highlighter-rouge). Do NOT add to .highlight
+// or we get a ghost label from the inner div which has no data-lang.
 div.highlighter-rouge::before {
   content: attr(data-lang);
   position: absolute;
@@ -50,13 +50,15 @@ div.highlighter-rouge::before {
   color: var(--color-muted);
   background-color: var(--bg-hover);
   border-radius: 0 0 $radius-sm $radius-sm;
+  z-index: 1;
 }
 
-// Copy button
+// Copy button: always visible (no opacity ghost), clearer on hover
 .code-copy-btn {
   position: absolute;
   top: $space-2;
   right: $space-2;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,8 +70,8 @@ div.highlighter-rouge::before {
   border-radius: $radius-md;
   color: var(--color-muted);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity $transition-fast, background-color $transition-fast, color $transition-fast;
+  opacity: 0.85;
+  transition: opacity $transition-fast, background-color $transition-fast, color $transition-fast, border-color $transition-fast;
   
   svg {
     width: 18px;
@@ -77,6 +79,7 @@ div.highlighter-rouge::before {
   }
   
   &:hover {
+    opacity: 1;
     background-color: var(--color-primary);
     border-color: var(--color-primary);
     color: white;
@@ -87,11 +90,6 @@ div.highlighter-rouge::before {
     border-color: var(--color-success);
     color: white;
   }
-}
-
-.highlight:hover .code-copy-btn,
-div.highlighter-rouge:hover .code-copy-btn {
-  opacity: 1;
 }
 
 // Line numbers (optional)
