@@ -9,20 +9,14 @@
   right: 0;
   z-index: $z-fixed;
   height: $header-height;
-  background-color: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
-  backdrop-filter: blur(8px);
-  
-  // Slight transparency for glass effect
-  background-color: rgba(var(--bg-card), 0.95);
+  backdrop-filter: blur(12px);
+  // Match sidebar/page background (not stark white in light mode)
+  background-color: var(--bg-sidebar);
 }
 
 [data-theme="dark"] .site-header {
   background-color: rgba(40, 41, 44, 0.95);
-}
-
-:root .site-header {
-  background-color: rgba(255, 255, 255, 0.95);
 }
 
 .header-container {
@@ -35,41 +29,58 @@
   padding: 0 $space-6;
 }
 
-// Logo
+// Logo: show only one at a time (full on desktop, mark on mobile; theme variant by data-theme)
 .header-logo {
   display: flex;
   align-items: center;
   gap: $space-3;
   flex-shrink: 0;
-  
+
   a {
     display: flex;
     align-items: center;
-    
+
     &:hover {
       text-decoration: none;
     }
   }
-  
+
   img, svg {
     height: 32px;
     width: auto;
   }
-  
-  // Hide full logo on mobile, show mark
-  .logo-full {
+
+  // Light mode: show light variants only
+  .logo-dark-mode {
+    display: none !important;
+  }
+  .logo-light-mode.logo-full {
     display: none;
-    
     @media (min-width: $breakpoint-md) {
-      display: block;
+      display: block !important;
     }
   }
-  
-  .logo-mark {
+  .logo-light-mode.logo-mark {
     display: block;
-    
     @media (min-width: $breakpoint-md) {
-      display: none;
+      display: none !important;
+    }
+  }
+
+  // Dark mode: show dark variants only (data-theme is on html)
+  html[data-theme="dark"] & .logo-light-mode {
+    display: none !important;
+  }
+  html[data-theme="dark"] & .logo-dark-mode.logo-full {
+    display: none;
+    @media (min-width: $breakpoint-md) {
+      display: block !important;
+    }
+  }
+  html[data-theme="dark"] & .logo-dark-mode.logo-mark {
+    display: block;
+    @media (min-width: $breakpoint-md) {
+      display: none !important;
     }
   }
 }
