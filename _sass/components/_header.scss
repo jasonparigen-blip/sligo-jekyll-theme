@@ -29,7 +29,7 @@
   padding: 0 $space-6;
 }
 
-// Logo: show only one at a time (full on desktop, mark on mobile; theme variant by data-theme)
+// Logo: show only one at a time (full on desktop, mark on mobile; one variant per theme)
 .header-logo {
   display: flex;
   align-items: center;
@@ -50,34 +50,40 @@
     width: auto;
   }
 
-  // Light mode: show light variants only
-  .logo-dark-mode {
+  // --- Full logo: one visible (light OR dark) on desktop ---
+  .logo-full.logo-dark-mode {
     display: none !important;
   }
-  .logo-light-mode.logo-full {
+  .logo-full.logo-light-mode {
     display: none;
     @media (min-width: $breakpoint-md) {
       display: block !important;
     }
   }
-  .logo-light-mode.logo-mark {
+  html[data-theme="dark"] & .logo-full.logo-light-mode {
+    display: none !important;
+  }
+  html[data-theme="dark"] & .logo-full.logo-dark-mode {
+    display: none;
+    @media (min-width: $breakpoint-md) {
+      display: block !important;
+    }
+  }
+
+  // --- Mark/icon: one visible (light OR dark) on mobile ---
+  .logo-mark.logo-dark-mode {
+    display: none !important;
+  }
+  .logo-mark.logo-light-mode {
     display: block;
     @media (min-width: $breakpoint-md) {
       display: none !important;
     }
   }
-
-  // Dark mode: show dark variants only (data-theme is on html)
-  html[data-theme="dark"] & .logo-light-mode {
+  html[data-theme="dark"] & .logo-mark.logo-light-mode {
     display: none !important;
   }
-  html[data-theme="dark"] & .logo-dark-mode.logo-full {
-    display: none;
-    @media (min-width: $breakpoint-md) {
-      display: block !important;
-    }
-  }
-  html[data-theme="dark"] & .logo-dark-mode.logo-mark {
+  html[data-theme="dark"] & .logo-mark.logo-dark-mode {
     display: block;
     @media (min-width: $breakpoint-md) {
       display: none !important;
