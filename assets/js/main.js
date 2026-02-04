@@ -215,7 +215,9 @@
   // ==========================================================================
   
   function addCopyButtons() {
-    const codeBlocks = document.querySelectorAll('div.highlighter-rouge, div.highlight, pre.highlight');
+    // Only target the top-level Rouge wrapper (one per code block). Do NOT also select
+    // div.highlight or pre.highlight — they are nested inside and would add 3 buttons.
+    const codeBlocks = document.querySelectorAll('div.highlighter-rouge');
     
     codeBlocks.forEach(block => {
       // Skip if already has copy button
