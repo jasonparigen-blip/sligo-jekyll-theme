@@ -83,7 +83,7 @@
     display: none !important;
   }
   html[data-theme="dark"] & .logo-mark.logo-dark-mode {
-    display: block;
+    display: block !important;
     @media (min-width: $breakpoint-md) {
       display: none !important;
     }
