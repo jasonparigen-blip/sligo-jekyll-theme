@@ -105,7 +105,10 @@ body {
   --bg-sidebar: #{$bg-sidebar-light};
   --bg-card: #{$bg-card-light};
   --bg-code: #{$bg-code-light};
-  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-hover: #{$bg-hover-light};
+  --bg-version-dropdown: #{$bg-version-dropdown-light};
+  --color-sidebar-link: #{$color-headline};
+  --color-sidebar-icon: #{$color-accent-01};
   
   --border-color: #{$border-color-light};
   --shadow: #{$shadow-md};
@@ -132,6 +135,9 @@ body {
   --bg-card: #{$bg-card-dark};
   --bg-code: #{$bg-code-dark};
   --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-version-dropdown: #{$bg-card-dark};
+  --color-sidebar-link: #{$color-body-dark};
+  --color-sidebar-icon: #{$color-muted};
   
   --border-color: #{$border-color-dark};
   --shadow: #{$shadow-dark-md};
@@ -159,6 +165,9 @@ body {
     --bg-card: #{$bg-card-dark};
     --bg-code: #{$bg-code-dark};
     --bg-hover: rgba(255, 255, 255, 0.06);
+    --bg-version-dropdown: #{$bg-card-dark};
+    --color-sidebar-link: #{$color-body-dark};
+    --color-sidebar-icon: #{$color-muted};
     
     --border-color: #{$border-color-dark};
     --shadow: #{$shadow-dark-md};
@@ -190,19 +199,19 @@ h1 {
 
 h2 {
   font-size: clamp(#{$text-2xl}, 4vw, #{$text-3xl});
-  margin-top: $space-10;
-  padding-bottom: $space-3;
-  border-bottom: 1px solid var(--border-color);
+  margin-top: $space-12;
+  padding-bottom: 0;
+  margin-bottom: $space-4;
 }
 
 h3 {
   font-size: $text-xl;
-  margin-top: $space-8;
+  margin-top: $space-10;
 }
 
 h4 {
   font-size: $text-lg;
-  margin-top: $space-6;
+  margin-top: $space-8;
 }
 
 h5 {

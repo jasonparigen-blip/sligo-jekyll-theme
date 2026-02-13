@@ -43,7 +43,7 @@
   }
 }
 
-// Primary button
+// Primary button (e.g. Get Started CTA – keep text visible on hover)
 .btn--primary {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
@@ -52,11 +52,13 @@
   &:hover {
     background-color: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
+    color: white;
   }
   
   &:active {
     background-color: $color-primary-80;
     border-color: $color-primary-80;
+    color: white;
   }
 }
 

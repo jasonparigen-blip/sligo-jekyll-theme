@@ -29,12 +29,13 @@
   padding: 0 $space-6;
 }
 
-// Logo: show only one at a time (full on desktop, mark on mobile; one variant per theme)
+// Logo: left-aligned at top of header; show one variant per theme (full on desktop, mark on mobile)
 .header-logo {
   display: flex;
   align-items: center;
   gap: $space-3;
   flex-shrink: 0;
+  margin-right: auto;
 
   a {
     display: flex;
@@ -105,13 +106,14 @@
   padding: $space-2 $space-3;
   font-size: $text-sm;
   font-weight: $weight-medium;
-  color: var(--color-body);
+  color: var(--color-headline);
   border-radius: $radius-md;
   transition: color $transition-fast, background-color $transition-fast;
   
   svg {
     width: 18px;
     height: 18px;
+    color: var(--color-headline);
   }
   
   &:hover {
@@ -137,7 +139,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  color: var(--color-body);
+  color: var(--color-headline);
   border-radius: $radius-md;
   transition: color $transition-fast, background-color $transition-fast;
   
@@ -159,7 +161,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  color: var(--color-body);
+  color: var(--color-headline);
   border-radius: $radius-md;
   transition: color $transition-fast, background-color $transition-fast;
   
@@ -206,8 +208,8 @@
   padding: $space-2 $space-3;
   font-size: $text-sm;
   font-weight: $weight-medium;
-  color: var(--color-body);
-  background-color: var(--bg-hover);
+  color: var(--color-headline);
+  background-color: var(--bg-version-dropdown);
   border: 1px solid var(--border-color);
   border-radius: $radius-md;
   cursor: pointer;
@@ -234,7 +236,7 @@
   right: 0;
   min-width: 150px;
   padding: $space-2;
-  background-color: var(--bg-card);
+  background-color: var(--bg-version-dropdown);
   border: 1px solid var(--border-color);
   border-radius: $radius-lg;
   box-shadow: var(--shadow);
@@ -255,7 +257,7 @@
   width: 100%;
   padding: $space-2 $space-3;
   font-size: $text-sm;
-  color: var(--color-body);
+  color: var(--color-headline);
   text-align: left;
   border-radius: $radius-md;
   transition: background-color $transition-fast, color $transition-fast;
@@ -283,7 +285,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  color: var(--color-body);
+  color: var(--color-headline);
   border-radius: $radius-md;
   transition: color $transition-fast, background-color $transition-fast;
   

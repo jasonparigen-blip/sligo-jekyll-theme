@@ -62,11 +62,11 @@
   max-width: $content-max-width;
 }
 
-// Page header
+// Page header (no rule line – more space instead)
 .page-header {
-  margin-bottom: $space-8;
-  padding-bottom: $space-6;
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: $space-10;
+  padding-bottom: 0;
+}
   
   .page-title {
     margin-bottom: $space-3;

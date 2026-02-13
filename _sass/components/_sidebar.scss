@@ -88,7 +88,7 @@
   font-weight: $weight-semibold;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-muted);
+  color: var(--color-sidebar-icon);
   margin-bottom: $space-2;
 }
 
@@ -109,7 +109,7 @@
   gap: $space-3;
   padding: $space-2 $space-3;
   font-size: $text-sm;
-  color: var(--color-body);
+  color: var(--color-sidebar-link);
   border-radius: $radius-md;
   transition: color $transition-fast, background-color $transition-fast;
   
@@ -117,7 +117,7 @@
     width: 18px;
     height: 18px;
     flex-shrink: 0;
-    color: var(--color-muted);
+    color: var(--color-sidebar-icon);
     transition: color $transition-fast;
   }
   
@@ -127,18 +127,18 @@
     text-decoration: none;
     
     svg {
-      color: var(--color-primary);
+      color: var(--color-headline);
     }
   }
   
-  // Active state
+  // Active state (matches hover: links + icons #3C3E44, highlight BG)
   &.is-active {
-    color: var(--color-primary);
-    background-color: rgba($color-primary, 0.1);
+    color: var(--color-headline);
+    background-color: var(--bg-hover);
     font-weight: $weight-medium;
     
     svg {
-      color: var(--color-primary);
+      color: var(--color-headline);
     }
   }
 }
@@ -161,7 +161,7 @@
   align-items: center;
   padding: $space-1 $space-3;
   font-size: $text-sm;
-  color: var(--color-body);
+  color: var(--color-sidebar-link);
   border-left: 2px solid var(--border-color);
   transition: color $transition-fast, border-color $transition-fast;
   
@@ -172,7 +172,7 @@
   }
   
   &.is-active {
-    color: var(--color-primary);
+    color: var(--color-headline);
     border-color: var(--color-primary);
     font-weight: $weight-medium;
   }
@@ -187,7 +187,7 @@
     width: 100%;
     padding: $space-2 $space-3;
     font-size: $text-sm;
-    color: var(--color-body);
+    color: var(--color-sidebar-link);
     border-radius: $radius-md;
     transition: color $transition-fast, background-color $transition-fast;
     
@@ -231,10 +231,10 @@
   font-size: $text-sm;
   
   a {
-    color: var(--color-muted);
+    color: var(--color-sidebar-link);
     
     &:hover {
-      color: var(--color-primary);
+      color: var(--color-headline);
     }
   }
 }

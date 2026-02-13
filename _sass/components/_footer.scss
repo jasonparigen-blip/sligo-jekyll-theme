@@ -38,7 +38,7 @@
   }
 }
 
-// Footer links
+// Footer links (light: default #3C3E44, hover #128989)
 .footer-links {
   display: flex;
   flex-wrap: wrap;
@@ -46,7 +46,7 @@
   
   a {
     font-size: $text-sm;
-    color: var(--color-body);
+    color: var(--color-headline);
     
     &:hover {
       color: var(--color-primary);
@@ -76,6 +76,7 @@
   color: var(--color-muted);
 }
 
+// Footer social (light: default icon #8A7F84, hover icon #3C3E44, highlight #E3E0DE)
 .footer-social {
   display: flex;
   gap: $space-4;
@@ -86,7 +87,7 @@
     justify-content: center;
     width: 36px;
     height: 36px;
-    color: var(--color-muted);
+    color: var(--color-sidebar-icon);
     border-radius: $radius-md;
     transition: color $transition-fast, background-color $transition-fast;
     
@@ -96,7 +97,7 @@
     }
     
     &:hover {
-      color: var(--color-primary);
+      color: var(--color-headline);
       background-color: var(--bg-hover);
     }
   }

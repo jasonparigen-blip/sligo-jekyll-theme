@@ -82,11 +82,10 @@
     }
   }
   
-  // Horizontal rule
+  // Horizontal rule (spacing only, no visible line)
   hr {
-    margin: $space-10 0;
+    margin: $space-12 0;
     border: none;
-    border-top: 1px solid var(--border-color);
   }
   
   // Images
