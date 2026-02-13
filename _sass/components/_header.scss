@@ -24,18 +24,16 @@
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  max-width: $page-max-width;
-  margin: 0 auto;
+  width: 100%;
   padding: 0 $space-6;
 }
 
-// Logo: left-aligned at top of header; show one variant per theme (full on desktop, mark on mobile)
+// Logo: left-aligned at top of header (flush left within header); show one variant per theme
 .header-logo {
   display: flex;
   align-items: center;
   gap: $space-3;
   flex-shrink: 0;
-  margin-right: auto;
 
   a {
     display: flex;

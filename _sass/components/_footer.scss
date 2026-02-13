@@ -7,6 +7,10 @@
   padding: $space-8 $space-6;
   background-color: var(--bg-sidebar);
   border-top: 1px solid var(--border-color);
+  
+  @media (min-width: $breakpoint-lg) {
+    margin-left: $sidebar-width;
+  }
 }
 
 .footer-container {
