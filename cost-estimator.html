@@ -1,0 +1,591 @@
+---
+layout: default
+permalink: /cost-estimator/
+title: AI Infrastructure Cost Estimator
+---
+
+<div class="container">
+
+  <header>
+    <div class="eyebrow">Sligo.ai · Infrastructure Cost Tool</div>
+    <h1>AI Cost Estimator</h1>
+    <p class="subtitle">Terraform-aligned · EKS + RDS + ElastiCache + AI Services</p>
+
+    <div class="provider-toggle" id="providerToggle">
+      <button class="prov-btn aws active" data-prov="aws"><span class="dot"></span>AWS</button>
+      <button class="prov-btn azure" data-prov="azure"><span class="dot"></span>Azure</button>
+      <button class="prov-btn gcp" data-prov="gcp"><span class="dot"></span>GCP</button>
+      <button class="compare-btn" id="compareBtn">Compare All</button>
+    </div>
+  </header>
+
+  <div class="main-grid">
+
+    <!-- Config Panel -->
+    <aside class="config-panel">
+      <div class="panel-header">Workload Configuration</div>
+      <div class="config-body">
+
+        <!-- Use case -->
+        <div>
+          <div class="field-label">AI Use Case</div>
+          <div class="seg-group" id="useCaseSelector">
+            <button class="seg-btn active" data-value="llm">
+              LLM Inference
+              <span class="tag">API / RAG</span>
+            </button>
+            <button class="seg-btn" data-value="embedding">
+              Embeddings + Vector Search
+              <span class="tag">RAG Pipeline</span>
+            </button>
+            <button class="seg-btn" data-value="vision">
+              Computer Vision
+              <span class="tag">Image Analysis</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- LLM model selection -->
+        <div id="llmModelGroup">
+          <div class="field-label">LLM Model</div>
+          <div class="seg-group" id="llmModelSelector">
+            <button class="seg-btn active" data-value="gpt4o">
+              GPT-4o <span class="tag">$5/$15 per 1M tokens</span>
+            </button>
+            <button class="seg-btn" data-value="claude35">
+              Claude 3.5 Sonnet <span class="tag">$3/$15 per 1M tokens</span>
+            </button>
+            <button class="seg-btn" data-value="gemini15">
+              Gemini 1.5 Pro <span class="tag">$3.50/$10.50 per 1M</span>
+            </button>
+            <button class="seg-btn" data-value="llama3">
+              Llama 3.1 70B (hosted) <span class="tag">~$0.88/$0.88 per 1M</span>
+            </button>
+            <button class="seg-btn" data-value="mistral">
+              Mistral Large <span class="tag">$3/$9 per 1M tokens</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Vector store selection -->
+        <div id="vectorStoreGroup" style="display:none">
+          <div class="field-label">Vector Store</div>
+          <div class="seg-group" id="vectorStoreSelector">
+            <button class="seg-btn active" data-value="managed_cloud">
+              Managed Cloud Native <span class="tag">OpenSearch/AI Search</span>
+            </button>
+            <button class="seg-btn" data-value="pinecone">
+              Pinecone <span class="tag">$0.096/GB/mo + queries</span>
+            </button>
+            <button class="seg-btn" data-value="weaviate">
+              Weaviate Cloud <span class="tag">~$25+ /mo</span>
+            </button>
+            <button class="seg-btn" data-value="pgvector">
+              pgvector (RDS ext.) <span class="tag">On existing RDS</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Volume -->
+        <div>
+          <div class="field-label">
+            <span>Monthly Requests</span>
+            <span class="field-val" id="volumeLabel">500K</span>
+          </div>
+          <input type="range" id="volumeSlider" min="0" max="9" value="4" step="1">
+          <div class="range-labels"><span>1K</span><span>100M</span></div>
+        </div>
+
+        <!-- Tokens per request (for LLM) -->
+        <div id="tokenSizeGroup">
+          <div class="field-label">
+            <span>Avg Tokens / Request</span>
+            <span class="field-val" id="tokenLabel">1,000 tokens</span>
+          </div>
+          <input type="range" id="tokenSlider" min="0" max="5" value="2" step="1">
+          <div class="range-labels"><span>200</span><span>8K</span></div>
+        </div>
+
+        <!-- Data size -->
+        <div>
+          <div class="field-label">
+            <span>Vector Data / Storage</span>
+            <span class="field-val" id="dataLabel">50 GB</span>
+          </div>
+          <input type="range" id="dataSlider" min="0" max="7" value="3" step="1">
+          <div class="range-labels"><span>1 GB</span><span>10 TB</span></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Include infrastructure -->
+        <div>
+          <div class="field-label" style="margin-bottom:10px">
+            <span>Include Terraform Infrastructure</span>
+          </div>
+          <div class="infra-toggle on" id="infraToggle">
+            <span style="font-size:12px;color:var(--muted2)">EKS + RDS (db.t3.medium) + Redis (cache.t3.micro)</span>
+            <div class="toggle-sw"></div>
+          </div>
+        </div>
+
+        <!-- Availability -->
+        <div>
+          <div class="field-label">Availability</div>
+          <div class="seg-group" id="availSelector">
+            <button class="seg-btn active" data-value="standard">Standard (99.9%)</button>
+            <button class="seg-btn" data-value="high">High Availability (99.99%)</button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- Results -->
+    <main>
+      <div class="results-header">
+        <div class="results-title">// Estimated Monthly Costs</div>
+        <div class="config-summary" id="configSummary">500K requests · 50 GB · GPT-4o</div>
+      </div>
+
+      <div class="provider-cards" id="providerCards"></div>
+
+      <div class="comparison-section" id="comparisonSection">
+        <div class="section-header">// Service Comparison Matrix</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Provider</th>
+              <th>AI Service</th>
+              <th>AI Cost</th>
+              <th>Infra Cost</th>
+              <th>Total / mo</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonBody"></tbody>
+        </table>
+      </div>
+
+      <div class="disclaimer">
+        <strong>⚠ Estimates only.</strong> Infrastructure costs from Terraform config: EKS (cluster + nodes), RDS postgres db.t3.medium 100GB, ElastiCache cache.t3.micro. AI pricing from public rate cards — actual costs vary by region, commitment discounts, and usage patterns. Use official calculators:
+        <a href="https://calculator.aws/pricing/2/home" target="_blank">AWS Calculator</a> ·
+        <a href="https://azure.microsoft.com/en-us/pricing/calculator/" target="_blank">Azure Calculator</a> ·
+        <a href="https://cloud.google.com/products/calculator" target="_blank">GCP Calculator</a>
+      </div>
+    </main>
+  </div>
+
+  <footer>Sligo.ai Cost Estimator · Terraform-aligned estimates · 2025</footer>
+</div>
+
+<script>
+// ── Data definitions ──────────────────────────────────────────────────────────
+
+const VOLUMES      = [1000,10000,50000,100000,500000,1000000,5000000,10000000,50000000,100000000];
+const VOL_LABELS   = ['1K','10K','50K','100K','500K','1M','5M','10M','50M','100M'];
+const DATA_GBS     = [1,5,10,50,100,500,1000,5000,10000,50000];
+const DATA_LABELS  = ['1 GB','5 GB','10 GB','50 GB','100 GB','500 GB','1 TB','5 TB','10 TB','50 TB'];
+const TOKEN_SIZES  = [200,500,1000,2000,4000,8000];
+const TOKEN_LABELS = ['200','500','1,000','2,000','4,000','8,000'];
+
+// LLM pricing: [input $/M tokens, output $/M tokens], assume 60% input 40% output
+const LLM_MODELS = {
+  gpt4o:    { name: 'GPT-4o',            inp: 5,    out: 15,   label: 'Azure OpenAI / Bedrock' },
+  claude35: { name: 'Claude 3.5 Sonnet', inp: 3,    out: 15,   label: 'Amazon Bedrock / Vertex AI' },
+  gemini15: { name: 'Gemini 1.5 Pro',    inp: 3.5,  out: 10.5, label: 'Vertex AI / Gemini API' },
+  llama3:   { name: 'Llama 3.1 70B',     inp: 0.88, out: 0.88, label: 'Bedrock / SageMaker / Azure' },
+  mistral:  { name: 'Mistral Large',     inp: 3,    out: 9,    label: 'Azure AI / Vertex AI' },
+};
+
+// Terraform infra costs (per month, based on terraform config)
+const INFRA_BASE = {
+  aws: {
+    eks_cluster:  73,
+    eks_nodes:    138,
+    rds_instance: 80,
+    rds_storage:  11.5,
+    redis:        13,
+  },
+  azure: {
+    eks_cluster:  0,
+    eks_nodes:    120,
+    rds_instance: 95,
+    rds_storage:  12,
+    redis:        16,
+  },
+  gcp: {
+    eks_cluster:  74,
+    eks_nodes:    100,
+    rds_instance: 70,
+    rds_storage:  17,
+    redis:        18,
+  }
+};
+
+// Vector store costs
+const VECTOR_STORE_COSTS = {
+  managed_cloud: { aws: 0, azure: 0, gcp: 0 },
+  pinecone:      { aws: 70, azure: 70, gcp: 70 },
+  weaviate:      { aws: 55, azure: 55, gcp: 55 },
+  pgvector:      { aws: 0, azure: 0, gcp: 0 },
+};
+
+let state = {
+  providers: ['aws'],
+  compareMode: false,
+  useCase: 'llm',
+  llmModel: 'gpt4o',
+  vectorStore: 'managed_cloud',
+  volumeIdx: 4,
+  tokenIdx: 2,
+  dataIdx: 3,
+  avail: 'standard',
+  includeInfra: true,
+};
+
+// ── Pricing functions ─────────────────────────────────────────────────────────
+
+function getInfraCost(provider) {
+  if (!state.includeInfra) return { total: 0, items: [] };
+  const b = INFRA_BASE[provider];
+  const haMulti = state.avail === 'high' ? 1 : 0;
+  const rdsMaz = haMulti ? b.rds_instance * 1.0 : 0;
+  const extraNode = state.avail === 'high' ? b.eks_nodes * 0.5 : 0;
+
+  const items = [
+    { name: 'Kubernetes Cluster', detail: `EKS/AKS/GKE — cluster fee`, price: b.eks_cluster, infra: true },
+    { name: 'K8s Worker Nodes', detail: `2x compute nodes${state.avail==='high'?'+extra':''}`, price: b.eks_nodes + extraNode, infra: true },
+    { name: 'PostgreSQL RDS', detail: `db.t3.medium · 100GB · ${state.avail==='high'?'Multi-AZ':'Single-AZ'}`, price: b.rds_instance + rdsMaz + b.rds_storage, infra: true },
+    { name: 'Redis Cache', detail: `cache.t3.micro / equiv`, price: b.redis, infra: true },
+  ];
+  return { total: items.reduce((s,i) => s+i.price, 0), items };
+}
+
+function getAICost(provider) {
+  const vol = VOLUMES[state.volumeIdx];
+  const dataGB = DATA_GBS[state.dataIdx];
+  const tokens = TOKEN_SIZES[state.tokenIdx];
+  const availMult = state.avail === 'high' ? 1.25 : 1.0;
+
+  if (state.useCase === 'llm') {
+    const model = LLM_MODELS[state.llmModel];
+    const totalTokensM = (vol * tokens) / 1_000_000;
+    const inputTokensM = totalTokensM * 0.6;
+    const outputTokensM = totalTokensM * 0.4;
+
+    const services = {
+      aws:   { name: 'Amazon Bedrock',       svcNote: 'Bedrock model routing + S3' },
+      azure: { name: 'Azure OpenAI Service', svcNote: 'Azure OpenAI + Blob Storage' },
+      gcp:   { name: 'Vertex AI',            svcNote: 'Vertex AI Model Garden' },
+    };
+
+    const storage = dataGB * (provider==='aws'?0.023:provider==='azure'?0.018:0.020);
+    const transfer = Math.min(vol * 0.00002, 300) * availMult;
+
+    return {
+      service: services[provider].name,
+      items: [
+        { name: `${model.name} — Input Tokens`,  detail: `${inputTokensM.toFixed(2)}M tokens @ $${model.inp}/M`,  price: inputTokensM  * model.inp * availMult },
+        { name: `${model.name} — Output Tokens`, detail: `${outputTokensM.toFixed(2)}M tokens @ $${model.out}/M`, price: outputTokensM * model.out * availMult },
+        { name: 'Object Storage',                detail: `${dataGB} GB · context/logs`,                           price: storage },
+        { name: 'Data Transfer / API GW',        detail: 'Estimated egress',                                      price: transfer },
+      ],
+      notes: getAINotes(provider, 'llm'),
+    };
+  }
+
+  if (state.useCase === 'embedding') {
+    const reqCostPer1K = { aws: 0.10, azure: 0.10, gcp: 0.025 }[provider];
+    const embCost = (vol / 1000) * reqCostPer1K * availMult;
+    const vsCost = VECTOR_STORE_COSTS[state.vectorStore][provider];
+    const storageExtra = state.vectorStore === 'managed_cloud'
+      ? dataGB * (provider==='aws'?0.30:provider==='azure'?0.25:0.20)
+      : dataGB * 0.023;
+
+    const embModels = { aws: 'Titan Embeddings V2', azure: 'text-embedding-3-small', gcp: 'text-embedding-004' };
+    const vsNames = {
+      managed_cloud: { aws: 'OpenSearch Serverless',   azure: 'Azure AI Search',     gcp: 'Vertex Vector Search' },
+      pinecone:      { aws: 'Pinecone',                azure: 'Pinecone',             gcp: 'Pinecone' },
+      weaviate:      { aws: 'Weaviate Cloud',          azure: 'Weaviate Cloud',       gcp: 'Weaviate Cloud' },
+      pgvector:      { aws: 'pgvector (RDS ext.)',     azure: 'pgvector (Flex.)',     gcp: 'pgvector (Cloud SQL)' },
+    };
+
+    const services = { aws: 'Bedrock + Vector Store', azure: 'Azure OpenAI Embed + Vector', gcp: 'Vertex AI + Vector Search' };
+
+    return {
+      service: services[provider],
+      items: [
+        { name: embModels[provider],                    detail: `${(vol/1000).toFixed(1)}K requests @ $${reqCostPer1K}/1K`, price: embCost },
+        { name: vsNames[state.vectorStore][provider],   detail: `${dataGB} GB vector index`,                                price: storageExtra + vsCost },
+        { name: 'Data Transfer',                        detail: 'Estimated',                                                price: 10 * availMult },
+      ],
+      notes: getAINotes(provider, 'embedding'),
+    };
+  }
+
+  if (state.useCase === 'vision') {
+    const ratesPer1K = { aws: 1.50, azure: 1.00, gcp: 1.50 };
+    const imgCost = (vol / 1000) * ratesPer1K[provider] * availMult;
+    const storage = dataGB * (provider==='aws'?0.023:provider==='azure'?0.018:0.020);
+    const services = { aws: 'Amazon Rekognition', azure: 'Azure AI Vision', gcp: 'Cloud Vision API' };
+    return {
+      service: services[provider],
+      items: [
+        { name: 'Image Analysis API',                   detail: `${(vol/1000).toFixed(1)}K images @ $${ratesPer1K[provider]}/1K`, price: imgCost },
+        { name: 'Object Storage',                       detail: `${dataGB} GB`,                                                   price: storage },
+        { name: 'Orchestration (Lambda/Functions)',     detail: 'Estimated',                                                      price: 12 * availMult },
+      ],
+      notes: getAINotes(provider, 'vision'),
+    };
+  }
+
+  return { service: 'N/A', items: [], notes: [] };
+}
+
+function getAINotes(provider, uc) {
+  const n = {
+    llm: {
+      aws:   ['Bedrock supports Claude, Titan, Llama, Mistral', 'Pay-per-token, no minimum commitment', 'Knowledge Bases for RAG native integration'],
+      azure: ['Azure OpenAI: GPT-4o, GPT-4-turbo, o3-mini', 'PTU reserved throughput for scale discounts', 'Enterprise compliance, RBAC, private endpoints'],
+      gcp:   ['Vertex AI Model Garden: Gemini, Claude, Llama', 'Gemini Flash for cost-optimized inference', 'Regional endpoints for data residency'],
+    },
+    embedding: {
+      aws:   ['Titan Embeddings V2 — 1,024 dimensions', 'OpenSearch k-NN for vector similarity', 'Bedrock Knowledge Bases for RAG pipelines'],
+      azure: ['text-embedding-3-small — 1,536 dims', 'Azure AI Search: hybrid vector + keyword', 'Semantic ranker for re-ranking results'],
+      gcp:   ['text-embedding-004 — 768 dims, lowest cost', 'Vertex Vector Search for ANN at scale', 'Streaming index updates supported'],
+    },
+    vision: {
+      aws:   ['Object detection, OCR, facial analysis', '5K images/month free tier', 'Custom labels via Rekognition Custom'],
+      azure: ['OCR, spatial analysis, dense captioning', '5K transactions/month free', 'Florence foundation model backing'],
+      gcp:   ['Label detection, OCR, face detection', '1K units/month free', 'AutoML Vision for custom training'],
+    },
+  };
+  return n[uc]?.[provider] ?? [];
+}
+
+function calcTotal(items) { return items.reduce((s,i) => s+i.price, 0); }
+
+function fmt(n) {
+  if (n >= 10000) return '$' + (n/1000).toFixed(1) + 'K';
+  if (n >= 1000)  return '$' + (n/1000).toFixed(2) + 'K';
+  if (n >= 100)   return '$' + Math.round(n);
+  return '$' + n.toFixed(0);
+}
+
+function barGrad(p) {
+  if (p === 'aws')   return 'linear-gradient(90deg,#ff9900,#ffcc66)';
+  if (p === 'azure') return 'linear-gradient(90deg,#5ba4ff,#aad4ff)';
+  return 'linear-gradient(90deg,#4af0c4,#34e0a1)';
+}
+
+const PROVIDER_META = {
+  aws:   { name: 'AWS',   sub: 'Amazon Web Services',   logo: '▲', logoClass: 'logo-aws',   cardClass: 'aws',   color: 'var(--aws)' },
+  azure: { name: 'Azure', sub: 'Microsoft Azure',       logo: 'Az', logoClass: 'logo-azure', cardClass: 'azure', color: 'var(--azure)' },
+  gcp:   { name: 'GCP',  sub: 'Google Cloud Platform', logo: 'G',  logoClass: 'logo-gcp',   cardClass: 'gcp',   color: 'var(--gcp)' },
+};
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
+function renderAll() {
+  const providers = state.compareMode ? ['aws','azure','gcp'] : state.providers;
+
+  const allAI    = {};
+  const allInfra = {};
+  const allTotals = {};
+
+  ['aws','azure','gcp'].forEach(p => {
+    const ai    = getAICost(p);
+    const infra = getInfraCost(p);
+    allAI[p]     = ai;
+    allInfra[p]  = infra;
+    allTotals[p] = calcTotal(ai.items) + infra.total;
+  });
+
+  const maxTotal = Math.max(...providers.map(p => allTotals[p]));
+  const minTotal = Math.min(...providers.map(p => allTotals[p]));
+  const cheapest = providers.find(p => allTotals[p] === minTotal);
+  const sorted   = [...providers].sort((a,b) => allTotals[a] - allTotals[b]);
+
+  const modelName = state.useCase === 'llm'       ? ` · ${LLM_MODELS[state.llmModel].name}` : '';
+  const vsName    = state.useCase === 'embedding' ? ` · ${state.vectorStore}`                : '';
+  document.getElementById('configSummary').textContent =
+    `${VOL_LABELS[state.volumeIdx]} req/mo · ${DATA_LABELS[state.dataIdx]}${modelName}${vsName}`;
+
+  const cardsHtml = sorted.map(p => {
+    const m      = PROVIDER_META[p];
+    const ai     = allAI[p];
+    const infra  = allInfra[p];
+    const aiTotal    = calcTotal(ai.items);
+    const total  = allTotals[p];
+    const isCheap = p === cheapest;
+    const barPct = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
+    const costColor = isCheap ? 'var(--accent)' : 'var(--text)';
+
+    let itemsHtml = '';
+    itemsHtml += `<div class="items-section-label">AI Services <span style="color:var(--accent);font-size:9px">● AI</span></div>`;
+    itemsHtml += ai.items.map(item => `
+      <div class="line-item">
+        <div class="item-left">
+          <span class="item-name">${item.name}</span>
+          <span class="item-detail">${item.detail}</span>
+        </div>
+        <span class="item-price" style="color:${isCheap?'var(--accent)':'var(--text)'}">${fmt(item.price)}</span>
+      </div>`).join('');
+
+    if (state.includeInfra && infra.items.length) {
+      itemsHtml += `<div class="items-section-label" style="margin-top:12px">Infrastructure (Terraform) <span style="color:var(--yellow);font-size:9px">● INFRA</span></div>`;
+      itemsHtml += infra.items.map(item => `
+        <div class="line-item infra-item">
+          <div class="item-left">
+            <span class="item-name">${item.name}</span>
+            <span class="item-detail">${item.detail}</span>
+          </div>
+          <span class="item-price" style="color:var(--yellow)">${fmt(item.price)}</span>
+        </div>`).join('');
+    }
+
+    const notesHtml = ai.notes.map(n => `<li>${n}</li>`).join('');
+
+    const breakdownHtml = state.includeInfra ? `
+      <div class="total-breakdown">
+        <span class="breakdown-chip chip-ai">AI: ${fmt(aiTotal)}</span>
+        <span class="breakdown-chip chip-infra">Infra: ${fmt(infra.total)}</span>
+      </div>` : '';
+
+    return `
+      <div class="provider-card provider-${p} ${isCheap ? 'cheapest' : ''}">
+        <div class="card-header">
+          <div class="provider-info">
+            <div class="provider-logo ${m.logoClass}">${m.logo}</div>
+            <div>
+              <div class="provider-name">${m.name}</div>
+              <div class="provider-sub">${ai.service}</div>
+            </div>
+          </div>
+          <div class="total-cost">
+            <div class="cost-amount" style="color:${costColor}">${fmt(total)}</div>
+            <div class="cost-period">/ month est.</div>
+            ${isCheap ? '<span class="cheapest-badge">★ Lowest Cost</span>' : ''}
+            ${breakdownHtml}
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="line-items">${itemsHtml}</div>
+          <div class="cost-bar-wrap">
+            <div class="cost-bar-label"><span>Relative cost</span><span>${barPct.toFixed(0)}% of max</span></div>
+            <div class="cost-bar-track"><div class="cost-bar-fill" style="width:${barPct}%;background:${barGrad(p)}"></div></div>
+          </div>
+          <div class="service-notes ${m.cardClass}">
+            <div class="notes-title">Key Notes</div>
+            <ul class="notes-list">${notesHtml}</ul>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('providerCards').innerHTML = cardsHtml;
+
+  const tableHtml = sorted.map(p => {
+    const m    = PROVIDER_META[p];
+    const ai   = allAI[p];
+    const aiT  = calcTotal(allAI[p].items);
+    const infraT = allInfra[p].total;
+    return `
+      <tr>
+        <td class="prov-cell" style="color:${m.color}">${m.name}</td>
+        <td>${ai.service}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:11px">${fmt(aiT)}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--yellow)">${state.includeInfra ? fmt(infraT) : '—'}</td>
+        <td style="font-weight:700;font-family:'Space Mono',monospace;color:${p===cheapest?'var(--accent)':'var(--text)'}">${fmt(allTotals[p])}</td>
+      </tr>`;
+  }).join('');
+
+  document.getElementById('comparisonBody').innerHTML = tableHtml;
+}
+
+// ── Controls ──────────────────────────────────────────────────────────────────
+
+document.getElementById('providerToggle').addEventListener('click', e => {
+  const btn = e.target.closest('.prov-btn');
+  const cb  = e.target.closest('.compare-btn');
+
+  if (cb) {
+    state.compareMode = !state.compareMode;
+    cb.classList.toggle('active', state.compareMode);
+    if (state.compareMode) {
+      document.querySelectorAll('.prov-btn').forEach(b => b.classList.remove('active'));
+    } else {
+      if (state.providers.length === 0) state.providers = ['aws'];
+      document.querySelectorAll('.prov-btn').forEach(b => {
+        b.classList.toggle('active', state.providers.includes(b.dataset.prov));
+      });
+    }
+    renderAll();
+    return;
+  }
+
+  if (!btn) return;
+  if (state.compareMode) {
+    state.compareMode = false;
+    document.getElementById('compareBtn').classList.remove('active');
+  }
+
+  const prov = btn.dataset.prov;
+  state.providers = [prov];
+  document.querySelectorAll('.prov-btn').forEach(b => b.classList.toggle('active', b.dataset.prov === prov));
+  renderAll();
+});
+
+function bindSeg(id, key, onChange) {
+  document.getElementById(id).addEventListener('click', e => {
+    const btn = e.target.closest('.seg-btn');
+    if (!btn) return;
+    document.querySelectorAll(`#${id} .seg-btn`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state[key] = btn.dataset.value;
+    if (onChange) onChange();
+    renderAll();
+  });
+}
+
+bindSeg('useCaseSelector', 'useCase', () => {
+  const isLLM = state.useCase === 'llm';
+  const isEmb = state.useCase === 'embedding';
+  document.getElementById('llmModelGroup').style.display    = isLLM ? '' : 'none';
+  document.getElementById('vectorStoreGroup').style.display = isEmb ? '' : 'none';
+  document.getElementById('tokenSizeGroup').style.display   = isLLM ? '' : 'none';
+});
+
+bindSeg('llmModelSelector',   'llmModel');
+bindSeg('vectorStoreSelector','vectorStore');
+bindSeg('availSelector',      'avail');
+
+document.getElementById('volumeSlider').addEventListener('input', e => {
+  state.volumeIdx = +e.target.value;
+  document.getElementById('volumeLabel').textContent = VOL_LABELS[state.volumeIdx];
+  renderAll();
+});
+
+document.getElementById('tokenSlider').addEventListener('input', e => {
+  state.tokenIdx = +e.target.value;
+  document.getElementById('tokenLabel').textContent = TOKEN_LABELS[state.tokenIdx] + ' tokens';
+  renderAll();
+});
+
+document.getElementById('dataSlider').addEventListener('input', e => {
+  state.dataIdx = +e.target.value;
+  document.getElementById('dataLabel').textContent = DATA_LABELS[state.dataIdx];
+  renderAll();
+});
+
+document.getElementById('infraToggle').addEventListener('click', () => {
+  state.includeInfra = !state.includeInfra;
+  document.getElementById('infraToggle').classList.toggle('on', state.includeInfra);
+  renderAll();
+});
+
+// Initial render
+renderAll();
+</script>
